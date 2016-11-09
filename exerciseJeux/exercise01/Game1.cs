@@ -11,11 +11,14 @@ namespace exercise01
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Rectangle fenetre;
+        GameObject heros;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
         }
 
         /// <summary>
@@ -29,6 +32,13 @@ namespace exercise01
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+
+            this.graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
+            this.graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
+
+
+            this.graphics.ToggleFullScreen();
         }
 
         /// <summary>
@@ -39,6 +49,17 @@ namespace exercise01
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            fenetre = graphics.GraphicsDevice.Viewport.Bounds;
+            fenetre.Width = graphics.GraphicsDevice.DisplayMode.Width;
+            fenetre.Height = graphics.GraphicsDevice.DisplayMode.Height;
+
+
+            heros = new GameObject();
+            heros.estVivant = true;
+            heros.vitesse = 5;
+            heros.sprite = Content.Load<Texture2D>("Mario (1).png");
+            heros.position = heros.sprite.Bounds;
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -61,11 +82,53 @@ namespace exercise01
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                heros.position.X += heros.vitesse;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                heros.position.X -= heros.vitesse;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                heros.position.Y -= heros.vitesse;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                heros.position.Y += heros.vitesse;
+            }
+
+
+
+
 
             // TODO: Add your update logic here
-
+            UpdateHeros();
             base.Update(gameTime);
         }
+        protected void UpdateHeros()
+        {
+            if (heros.position.X < fenetre.Left)
+            {
+                heros.position.X = fenetre.Left;
+            }
+            if (heros.position.X + heros.sprite.Width > fenetre.Right)
+            {
+                heros.position.X = fenetre.Right - heros.sprite.Width;
+            }
+            if (heros.position.Y < fenetre.Top)
+            {
+                heros.position.Y = fenetre.Top;
+            }
+            if (heros.position.Y + heros.sprite.Height > fenetre.Bottom)
+            {
+                heros.position.Y = fenetre.Bottom - heros.sprite.Height;
+            }
+           
+        }
+
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -74,6 +137,11 @@ namespace exercise01
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.Draw(heros.sprite, heros.position, Color.White);
+            spriteBatch.End();
+
+
 
             // TODO: Add your drawing code here
 

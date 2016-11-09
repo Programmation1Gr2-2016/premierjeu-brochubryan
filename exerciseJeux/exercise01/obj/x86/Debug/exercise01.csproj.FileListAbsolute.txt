@@ -23,3 +23,4 @@ C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exer
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\obj\x86\Debug\exercise01.csprojResolveAssemblyReference.cache
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\obj\x86\Debug\exercise01.exe
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\obj\x86\Debug\exercise01.pdb
+C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\bin\Windows\x86\Debug\Content\Mario (1).png
