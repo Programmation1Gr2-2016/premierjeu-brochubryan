@@ -13,6 +13,11 @@ namespace exercise01
         SpriteBatch spriteBatch;
         Rectangle fenetre;
         GameObject heros;
+        GameObject enemi;
+        GameObject projectile;
+        bool enemidirection = true;
+        // si le projectile est en vie ou non
+        bool projVie = true;
 
         public Game1()
         {
@@ -38,7 +43,10 @@ namespace exercise01
             this.graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
 
 
-            this.graphics.ToggleFullScreen();
+            
+            this.graphics.ApplyChanges();
+            // ToggleFullScreen = mode plein écran sans bordure
+            //ApplyChanges = Mode plein écran avec la barre de titres Windows 
         }
 
         /// <summary>
@@ -56,9 +64,21 @@ namespace exercise01
 
             heros = new GameObject();
             heros.estVivant = true;
-            heros.vitesse = 5;
+            heros.vitesse = 10;
             heros.sprite = Content.Load<Texture2D>("Mario (1).png");
             heros.position = heros.sprite.Bounds;
+            //enemi
+            enemi = new GameObject();
+            enemi.estVivant = true;
+            enemi.vitesse = 11;
+            enemi.sprite = Content.Load<Texture2D>("enemie.png");
+            enemi.position = enemi.sprite.Bounds;
+            //projectile
+            projectile = new GameObject();
+            projectile.estVivant = true;
+            projectile.vitesse =14;
+            projectile.sprite = Content.Load<Texture2D>("enemi.png");
+            projectile.position = enemi.sprite.Bounds;
 
 
             // TODO: use this.Content to load your game content here
@@ -99,16 +119,38 @@ namespace exercise01
                 heros.position.Y += heros.vitesse;
             }
 
+            if (enemidirection == true)
+            {
+                enemi.position.X += enemi.vitesse;
+            }
+            else if (enemidirection == false)
+            {
+                enemi.position.X -= enemi.vitesse;
+            }
+            if (projVie == true)
+            {
+                projectile.position.Y += projectile.vitesse;
+            }
+
+           
+
+
+
 
 
 
 
             // TODO: Add your update logic here
             UpdateHeros();
+            UpdateEnemi();
+            UpdateProjectile();
+           
+            
             base.Update(gameTime);
         }
         protected void UpdateHeros()
         {
+            //hero détection des bords
             if (heros.position.X < fenetre.Left)
             {
                 heros.position.X = fenetre.Left;
@@ -125,9 +167,28 @@ namespace exercise01
             {
                 heros.position.Y = fenetre.Bottom - heros.sprite.Height;
             }
-           
+            
         }
+        protected void UpdateEnemi()
+        {
+            //enemi détection de bord
+            if (enemi.position.X < fenetre.Left)
+            {
+                enemidirection = true;
+            }
+            if (enemi.position.X + enemi.sprite.Bounds.Width > fenetre.Right)
+            {
+                enemidirection = false;
+            }
+        }
+        protected void UpdateProjectile()
+        {
+            if (projectile.position.Y > fenetre.Bottom)
+            {
+                projVie = false;
+            }
 
+        }
 
 
         /// <summary>
@@ -139,7 +200,10 @@ namespace exercise01
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             spriteBatch.Draw(heros.sprite, heros.position, Color.White);
+            spriteBatch.Draw(enemi.sprite, enemi.position, Color.White);
+            spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
             spriteBatch.End();
+
 
 
 

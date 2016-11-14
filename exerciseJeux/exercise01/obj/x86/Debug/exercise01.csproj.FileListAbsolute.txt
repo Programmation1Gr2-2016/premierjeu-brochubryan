@@ -24,3 +24,5 @@ C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exer
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\obj\x86\Debug\exercise01.exe
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\obj\x86\Debug\exercise01.pdb
 C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\bin\Windows\x86\Debug\Content\Mario (1).png
+C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\bin\Windows\x86\Debug\Content\enemi.png
+C:\Users\bryan\Documents\Visual Studio 2015\Projects\premierjeu-brochubryan\exerciseJeux\exercise01\bin\Windows\x86\Debug\Content\enemie.png
