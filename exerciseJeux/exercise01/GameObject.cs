@@ -16,5 +16,6 @@ namespace exercise01
         public int vitesse;
         public Texture2D sprite;
         public bool estVivant;
+        public Vector2 direction;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Threading;
 
 namespace exercise01
 {
@@ -9,16 +11,19 @@ namespace exercise01
     /// </summary>
     public class Game1 : Game
     {
+        const int NBENEMI = 3;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle fenetre;
         GameObject heros;
-        GameObject enemi;
+        GameObject[] enemi;
         GameObject projectile;
         bool enemidirection = true;
-        // si le projectile est en vie ou non
+        Texture2D defaite;
+        Texture2D victoire;
         bool projVie = true;
-
+        private object thread;
+        Random r = new Random();
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -42,8 +47,8 @@ namespace exercise01
             this.graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
             this.graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
 
+            this.Window.Position = new Point(0, 0);
 
-            
             this.graphics.ApplyChanges();
             // ToggleFullScreen = mode plein écran sans bordure
             //ApplyChanges = Mode plein écran avec la barre de titres Windows 
@@ -62,23 +67,44 @@ namespace exercise01
             fenetre.Height = graphics.GraphicsDevice.DisplayMode.Height;
 
 
+            defaite = Content.Load<Texture2D>("defaite.png");
+            victoire = Content.Load<Texture2D>("victory.png");
             heros = new GameObject();
             heros.estVivant = true;
             heros.vitesse = 10;
             heros.sprite = Content.Load<Texture2D>("Mario (1).png");
             heros.position = heros.sprite.Bounds;
+            heros.position.X = 0;
+            heros.position.Y = 700;
             //enemi
-            enemi = new GameObject();
-            enemi.estVivant = true;
-            enemi.vitesse = 11;
-            enemi.sprite = Content.Load<Texture2D>("enemie.png");
-            enemi.position = enemi.sprite.Bounds;
+            enemi = new GameObject[NBENEMI];
+            for (int i = 0; i < enemi.Length; i++)
+            {
+
+
+                enemi[i] = new GameObject();
+                enemi[i].estVivant = true;
+                enemi[i].vitesse = 11;
+                enemi[i].sprite = Content.Load<Texture2D>("enemie.png");
+                enemi[i].position = enemi[i].sprite.Bounds;
+                enemi[i].position.X = i * 300;
+                enemi[i].position.Y = 0;
+                //enemi[i].direction.X = r.Next(-4, 5);
+               // enemi[i].direction.Y = r.Next(-4, 5);
+            }
+
             //projectile
             projectile = new GameObject();
             projectile.estVivant = true;
-            projectile.vitesse =14;
+            projectile.vitesse = 14;
             projectile.sprite = Content.Load<Texture2D>("enemi.png");
-            projectile.position = enemi.sprite.Bounds;
+            for (int i = 0; i < enemi.Length; i++)
+            {
+                
+                projectile.position = enemi[i].sprite.Bounds;
+
+            }
+
 
 
             // TODO: use this.Content to load your game content here
@@ -118,34 +144,64 @@ namespace exercise01
             {
                 heros.position.Y += heros.vitesse;
             }
+            for (int i = 0; i < enemi.Length; i++)
+            {
+                if (enemidirection == true)
+                {
+                    enemi[i].position.X += enemi[i].vitesse;
+                }
+                else if (enemidirection == false)
+                {
+                    enemi[i].position.X -= enemi[i].vitesse;
+                }
+            }
 
-            if (enemidirection == true)
-            {
-                enemi.position.X += enemi.vitesse;
-            }
-            else if (enemidirection == false)
-            {
-                enemi.position.X -= enemi.vitesse;
-            }
             if (projVie == true)
             {
                 projectile.position.Y += projectile.vitesse;
             }
 
-           
+            //collision
 
 
+            for (int i = 0; i < enemi.Length; i++)
+            {
+                if (heros.position.Intersects(enemi[i].position))
+                {
+                    enemi[i].estVivant = false;
+                    projectile.estVivant = false;
+                }
 
 
+            }
+            if (projectile.position.Intersects(heros.position))
+            {
+                heros.estVivant = false;
 
+            }
+          
+            
+            if (projectile.position.Y == fenetre.Bottom)
+            {
+                projectile.estVivant = false;
+            }
+            if (projectile.estVivant == false)
+            {
+                for (int i = 0; i < enemi.Length; i++)
+                {
+                    projectile.position = enemi[i].position;
+                    projectile.estVivant = true;
+                    projectile.position.Y += projectile.vitesse;
+                }
 
+            }
 
             // TODO: Add your update logic here
             UpdateHeros();
             UpdateEnemi();
             UpdateProjectile();
-           
-            
+
+
             base.Update(gameTime);
         }
         protected void UpdateHeros()
@@ -167,26 +223,35 @@ namespace exercise01
             {
                 heros.position.Y = fenetre.Bottom - heros.sprite.Height;
             }
-            
+
         }
         protected void UpdateEnemi()
         {
             //enemi détection de bord
-            if (enemi.position.X < fenetre.Left)
+            for (int i = 0; i < enemi.Length; i++)
             {
-                enemidirection = true;
+                if (enemi[i].position.X < fenetre.Left)
+                {
+                    enemidirection = true;
+                }
+                if (enemi[i].position.X + enemi[i].sprite.Bounds.Width > fenetre.Right)
+                {
+                    enemidirection = false;
+                }
             }
-            if (enemi.position.X + enemi.sprite.Bounds.Width > fenetre.Right)
-            {
-                enemidirection = false;
-            }
+
         }
+       
         protected void UpdateProjectile()
         {
-            if (projectile.position.Y > fenetre.Bottom)
+            for (int i = 0; i < enemi.Length; i++)
             {
-                projVie = false;
+                if (projectile.estVivant)
+                {
+                    projectile.position.X = enemi[i].position.X;
+                }
             }
+
 
         }
 
@@ -199,9 +264,46 @@ namespace exercise01
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            spriteBatch.Draw(heros.sprite, heros.position, Color.White);
-            spriteBatch.Draw(enemi.sprite, enemi.position, Color.White);
-            spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
+            if (heros.estVivant)
+            {
+                spriteBatch.Draw(heros.sprite, heros.position, Color.White);
+
+            }
+            else if (heros.estVivant == false)
+            {
+                GraphicsDevice.Clear(Color.Red);
+                spriteBatch.Draw(defaite, new Rectangle(0, 0, defaite.Width, defaite.Height), Color.White);
+                projectile.estVivant = false;
+
+
+            }
+
+            for (int i = 0; i < enemi.Length; i++)
+            {
+                if (enemi[i].estVivant)
+                {
+                    spriteBatch.Draw(enemi[i].sprite, enemi[i].position, Color.White);
+                }
+                else
+                {
+                    spriteBatch.Draw(victoire, new Rectangle(0, 0, victoire.Width, victoire.Height), Color.White);
+                    projectile.estVivant = false;
+                }
+            }
+
+
+
+
+            if (projectile.estVivant == true)
+            {
+
+                spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
+            }
+            if (projVie == true)
+            {
+
+                spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
+            }
             spriteBatch.End();
 
 
