@@ -12,17 +12,17 @@ namespace exercise01
     public class Game1 : Game
     {
         const int NBENEMI = 3;
+        const int NBBALL = 3;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle fenetre;
         GameObject heros;
         GameObject[] enemi;
-        GameObject projectile;
+        GameObject[] projectile;
         bool enemidirection = true;
         Texture2D defaite;
         Texture2D victoire;
         bool projVie = true;
-        private object thread;
         Random r = new Random();
         public Game1()
         {
@@ -78,6 +78,7 @@ namespace exercise01
             heros.position.Y = 700;
             //enemi
             enemi = new GameObject[NBENEMI];
+            projectile = new GameObject[NBBALL];
             for (int i = 0; i < enemi.Length; i++)
             {
 
@@ -90,20 +91,22 @@ namespace exercise01
                 enemi[i].position.X = i * 300;
                 enemi[i].position.Y = 0;
                 //enemi[i].direction.X = r.Next(-4, 5);
-               // enemi[i].direction.Y = r.Next(-4, 5);
+                // enemi[i].direction.Y = r.Next(-4, 5);
             }
 
             //projectile
-            projectile = new GameObject();
-            projectile.estVivant = true;
-            projectile.vitesse = 14;
-            projectile.sprite = Content.Load<Texture2D>("enemi.png");
-            for (int i = 0; i < enemi.Length; i++)
+            for (int i = 0; i < projectile.Length; i++)
             {
-                
-                projectile.position = enemi[i].sprite.Bounds;
+                projectile[i] = new GameObject();
+                projectile[i].estVivant = true;
+                projectile[i].vitesse = 14;
+                projectile[i].sprite = Content.Load<Texture2D>("enemi.png");
 
+                projectile[i].position = enemi[0].sprite.Bounds;
             }
+
+
+
 
 
 
@@ -158,7 +161,11 @@ namespace exercise01
 
             if (projVie == true)
             {
-                projectile.position.Y += projectile.vitesse;
+                for (int i = 0; i < projectile.Length; i++)
+                {
+                    projectile[i].position.Y += projectile[i].vitesse;
+                }
+
             }
 
             //collision
@@ -169,33 +176,15 @@ namespace exercise01
                 if (heros.position.Intersects(enemi[i].position))
                 {
                     enemi[i].estVivant = false;
-                    projectile.estVivant = false;
+                    projectile[i].estVivant = false;
                 }
 
-
-            }
-            if (projectile.position.Intersects(heros.position))
-            {
-                heros.estVivant = false;
-
-            }
-          
-            
-            if (projectile.position.Y == fenetre.Bottom)
-            {
-                projectile.estVivant = false;
-            }
-            if (projectile.estVivant == false)
-            {
-                for (int i = 0; i < enemi.Length; i++)
+                if (projectile[i].position.Intersects(heros.position))
                 {
-                    projectile.position = enemi[i].position;
-                    projectile.estVivant = true;
-                    projectile.position.Y += projectile.vitesse;
+                    heros.estVivant = false;
+
                 }
-
             }
-
             // TODO: Add your update logic here
             UpdateHeros();
             UpdateEnemi();
@@ -241,17 +230,35 @@ namespace exercise01
             }
 
         }
-       
+
         protected void UpdateProjectile()
         {
-            for (int i = 0; i < enemi.Length; i++)
+            for (int i = 0; i < projectile.Length; i++)
             {
-                if (projectile.estVivant)
+                if (projectile[i].estVivant)
                 {
-                    projectile.position.X = enemi[i].position.X;
+                    projectile[i].position.X = enemi[i].position.X;
+
                 }
             }
 
+
+            //detection de bord projectile
+            for (int i = 0; i < projectile.Length; i++)
+            {
+                if (projectile[i].position.Y > fenetre.Bottom)
+                {
+                    projectile[i].estVivant = false;
+                }
+                if (projectile[i].estVivant == false && enemi[i].estVivant == true)
+                {
+                    projectile[i].estVivant = true;
+                    projectile[i].position = enemi[i].position;
+
+
+                }
+
+            }
 
         }
 
@@ -264,6 +271,7 @@ namespace exercise01
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
+            //défaire
             if (heros.estVivant)
             {
                 spriteBatch.Draw(heros.sprite, heros.position, Color.White);
@@ -273,37 +281,41 @@ namespace exercise01
             {
                 GraphicsDevice.Clear(Color.Red);
                 spriteBatch.Draw(defaite, new Rectangle(0, 0, defaite.Width, defaite.Height), Color.White);
-                projectile.estVivant = false;
-
-
+                for (int i = 0; i < projectile.Length; i++)
+                {
+                    projectile[i].estVivant = false;
+                }
             }
-
+            //victoire
             for (int i = 0; i < enemi.Length; i++)
             {
                 if (enemi[i].estVivant)
                 {
                     spriteBatch.Draw(enemi[i].sprite, enemi[i].position, Color.White);
                 }
-                else
+                if (enemi[0].estVivant == false && enemi[1].estVivant == false && enemi[2].estVivant == false)
                 {
                     spriteBatch.Draw(victoire, new Rectangle(0, 0, victoire.Width, victoire.Height), Color.White);
-                    projectile.estVivant = false;
+                    projectile[i].estVivant = false;
                 }
             }
 
-
-
-
-            if (projectile.estVivant == true)
+            //dessiner projectil
+            for (int i = 0; i < projectile.Length; i++)
+            {
+          if (projectile[i].estVivant == true)
             {
 
-                spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
+                spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
             }
             if (projVie == true)
             {
 
-                spriteBatch.Draw(projectile.sprite, projectile.position, Color.White);
+                spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
             }
+            }
+
+  
             spriteBatch.End();
 
 
