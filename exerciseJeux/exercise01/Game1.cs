@@ -19,11 +19,12 @@ namespace exercise01
         GameObject heros;
         GameObject[] enemi;
         GameObject[] projectile;
-        bool enemidirection = true;
         Texture2D defaite;
         Texture2D victoire;
         bool projVie = true;
+        Texture2D backrood;
         Random r = new Random();
+        long temps = 0;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -46,7 +47,6 @@ namespace exercise01
 
             this.graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
             this.graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
-
             this.Window.Position = new Point(0, 0);
 
             this.graphics.ApplyChanges();
@@ -66,7 +66,7 @@ namespace exercise01
             fenetre.Width = graphics.GraphicsDevice.DisplayMode.Width;
             fenetre.Height = graphics.GraphicsDevice.DisplayMode.Height;
 
-
+            backrood = Content.Load<Texture2D>("jeuMap.jpg");
             defaite = Content.Load<Texture2D>("defaite.png");
             victoire = Content.Load<Texture2D>("victory.png");
             heros = new GameObject();
@@ -74,8 +74,8 @@ namespace exercise01
             heros.vitesse = 10;
             heros.sprite = Content.Load<Texture2D>("Mario (1).png");
             heros.position = heros.sprite.Bounds;
-            heros.position.X = 0;
-            heros.position.Y = 700;
+            heros.position.X = fenetre.Right - heros.sprite.Width;
+            heros.position.Y = fenetre.Bottom + heros.sprite.Height;
             //enemi
             enemi = new GameObject[NBENEMI];
             projectile = new GameObject[NBBALL];
@@ -88,10 +88,9 @@ namespace exercise01
                 enemi[i].vitesse = 11;
                 enemi[i].sprite = Content.Load<Texture2D>("enemie.png");
                 enemi[i].position = enemi[i].sprite.Bounds;
-                enemi[i].position.X = i * 300;
                 enemi[i].position.Y = 0;
-                //enemi[i].direction.X = r.Next(-4, 5);
-                // enemi[i].direction.Y = r.Next(-4, 5);
+                enemi[i].direction.X = r.Next(-11, 11);
+
             }
 
             //projectile
@@ -101,8 +100,8 @@ namespace exercise01
                 projectile[i].estVivant = true;
                 projectile[i].vitesse = 14;
                 projectile[i].sprite = Content.Load<Texture2D>("enemi.png");
-
-                projectile[i].position = enemi[0].sprite.Bounds;
+                
+                projectile[i].position = enemi[i].sprite.Bounds;
             }
 
 
@@ -147,18 +146,7 @@ namespace exercise01
             {
                 heros.position.Y += heros.vitesse;
             }
-            for (int i = 0; i < enemi.Length; i++)
-            {
-                if (enemidirection == true)
-                {
-                    enemi[i].position.X += enemi[i].vitesse;
-                }
-                else if (enemidirection == false)
-                {
-                    enemi[i].position.X -= enemi[i].vitesse;
-                }
-            }
-
+          
             if (projVie == true)
             {
                 for (int i = 0; i < projectile.Length; i++)
@@ -177,6 +165,9 @@ namespace exercise01
                 {
                     enemi[i].estVivant = false;
                     projectile[i].estVivant = false;
+                    //change la position du hero quand il tu un enemi
+                    heros.position.X = fenetre.Right - heros.sprite.Width;
+                    heros.position.Y = fenetre.Bottom - heros.sprite.Height;
                 }
 
                 if (projectile[i].position.Intersects(heros.position))
@@ -219,13 +210,18 @@ namespace exercise01
             //enemi détection de bord
             for (int i = 0; i < enemi.Length; i++)
             {
+                enemi[i].position.X += (int)enemi[i].direction.X;
+
                 if (enemi[i].position.X < fenetre.Left)
                 {
-                    enemidirection = true;
+
+                    enemi[i].direction.X = enemi[i].vitesse * -1;
+                    enemi[i].position.X = fenetre.Left;
                 }
                 if (enemi[i].position.X + enemi[i].sprite.Bounds.Width > fenetre.Right)
                 {
-                    enemidirection = false;
+                    enemi[i].direction.X = enemi[i].vitesse * -1;
+                    enemi[i].position.X = fenetre.Right - enemi[i].sprite.Width;
                 }
             }
 
@@ -271,6 +267,8 @@ namespace exercise01
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
+            //background
+            spriteBatch.Draw(backrood, new Rectangle(0, 0, backrood.Width, backrood.Height), Color.White);
             //défaire
             if (heros.estVivant)
             {
@@ -298,24 +296,26 @@ namespace exercise01
                     spriteBatch.Draw(victoire, new Rectangle(0, 0, victoire.Width, victoire.Height), Color.White);
                     projectile[i].estVivant = false;
                 }
+
+
             }
 
             //dessiner projectil
             for (int i = 0; i < projectile.Length; i++)
             {
-          if (projectile[i].estVivant == true)
-            {
+                if (projectile[i].estVivant == true)
+                {
 
-                spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
-            }
-            if (projVie == true)
-            {
+                    spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
+                }
+                if (projVie == true)
+                {
 
-                spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
-            }
+                    spriteBatch.Draw(projectile[i].sprite, projectile[i].position, Color.White);
+                }
             }
 
-  
+
             spriteBatch.End();
 
 

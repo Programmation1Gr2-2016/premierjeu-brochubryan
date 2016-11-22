@@ -60,7 +60,9 @@
     <Content Include="Content\enemie.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\map.jpeg" />
+    <Content Include="Content\jeuMap.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Mario %281%29.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
